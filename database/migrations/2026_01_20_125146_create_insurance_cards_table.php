@@ -13,7 +13,20 @@ return new class extends Migration
     {
         Schema::create('insurance_cards', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('patient_id')->constrained()->onDelete('cascade');
+            $table->string('policy_number');
+            $table->string('provider_name');
+            $table->string('group_number')->nullable();
+            $table->date('effective_date')->nullable();
+            $table->date('expiry_date')->nullable();
+            $table->string('card_image_path')->nullable();
+            $table->json('ocr_raw_data')->nullable();
+            $table->decimal('confidence_score', 5, 2)->nullable();
+            $table->boolean('is_verified')->default(false);
             $table->timestamps();
+            
+            $table->index('policy_number');
+
         });
     }
 
@@ -25,3 +38,4 @@ return new class extends Migration
         Schema::dropIfExists('insurance_cards');
     }
 };
+
