@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('patients', function (Blueprint $table) {
             $table->id();
-            $table->string('patient_id')->unique();
             $table->string('first_name');
             $table->string('last_name');
             $table->date('date_of_birth');
@@ -23,7 +22,7 @@ return new class extends Migration
             $table->string('emergency_contact')->nullable();
             $table->string('emergency_phone')->nullable();
             $table->text('address')->nullable();
-            $table->text('medical_history')->nullable();
+            $table->json('medical_history')->nullable();
             $table->json('allergies')->nullable();
             $table->json('current_medications')->nullable();
             $table->string('blood_type')->nullable();
@@ -31,7 +30,6 @@ return new class extends Migration
             $table->softDeletes();
             
             $table->index(['first_name', 'last_name']);
-            $table->index('patient_id');
         });
     }
 

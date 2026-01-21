@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+use App\Enums\BloodType;
+
 class Patient extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'patient_id',
         'first_name',
         'last_name',
         'date_of_birth',
@@ -33,6 +34,8 @@ class Patient extends Model
             'date_of_birth' => 'date',
             'allergies' => 'array',
             'current_medications' => 'array',
+            'medical_history' => 'array',
+            'blood_type' => BloodType::class,        
         ];
     }
 
@@ -49,21 +52,5 @@ class Patient extends Model
     public function getAgeAttribute(): int
     {
         return $this->date_of_birth->age;
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($patient) {
-            if (empty($patient->patient_id)) {
-                $patient->patient_id = 'PT' . now()->format('Ymd') . str_pad(
-                    static::whereDate('created_at', today())->count() + 1,
-                    4,
-                    '0',
-                    STR_PAD_LEFT
-                );
-            }
-        });
     }
 }
