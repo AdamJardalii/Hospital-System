@@ -34,5 +34,15 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'ocr' => [
+        'key' => env('OCR_SPACE_API_KEY'),
+        'url' => 'https://api.ocr.space/parse/image',
+    ], 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+        'url' => 'https://api.groq.com/openai/v1/chat/completions',
+    ],
 ];
