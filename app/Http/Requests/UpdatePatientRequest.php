@@ -29,17 +29,18 @@ class UpdatePatientRequest extends FormRequest
         return [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date|before:today',
+            'email'    => 'nullable|email|max:255',
+            'date_of_birth' => 'required|date|before_or_equal:today',
             'gender' => ['required',new Enum(Gender::class)],
             'phone' => 'required|string|max:20',
             'medical_history' => 'nullable|array',
             'allergies' => 'nullable|array',
             'current_medications' => 'nullable|array',
             'blood_type' => ['nullable',new Enum(BloodType::class)],
-            'insurance_policy_number' => 'nullable|string|max:255',
-            'insurance_provider' => 'nullable|string|max:255',
-            'insurance_group_number' => 'nullable|string|max:255',
-            'insurance_expiry_date' => 'nullable|date',
+            'insurance'               => 'sometimes|nullable|array',
+            'insurance.provider_name' => 'nullable|string|max:255',
+            'insurance.policy_number' => 'nullable|string|max:255',
+            'insurance.expiry_date'   => 'nullable|date',
         ];
     }
 }

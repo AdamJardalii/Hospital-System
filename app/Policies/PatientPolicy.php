@@ -2,65 +2,55 @@
 
 namespace App\Policies;
 
-use App\Models\Patient;
-use App\Models\User;
+use App\Models\{Patient,User};
 
 class PatientPolicy
 {
     /**
-     * Determine if user can view any patients
-     */
-    public function viewAny(User $user): bool
-    {
-        return $user->isAdmin() || $user->isStaff();
-    }
-
-    /**
-     * Determine if user can view the patient
+     * View a single patient
      */
     public function view(User $user, Patient $patient): bool
     {
-        return $user->isAdmin() || $user->isStaff();
+        return $patient->user_id === $user->id;
     }
 
     /**
-     * Determine if user can create patients
+     * Create patient
      */
     public function create(User $user): bool
     {
-        return $user->isAdmin() || $user->isStaff();
+        return true;
     }
 
     /**
-     * Determine if user can update the patient
+     * Update patient
      */
     public function update(User $user, Patient $patient): bool
     {
-        return $user->isAdmin() || $user->isStaff();
+        return $patient->user_id === $user->id;
     }
 
     /**
-     * Determine if user can delete the patient
+     * Delete patient
      */
     public function delete(User $user, Patient $patient): bool
     {
-        // Only admins can delete
-        return $user->isAdmin();
+        return $patient->user_id === $user->id;
     }
 
     /**
-     * Determine if user can restore the patient
+     * Restore patient
      */
     public function restore(User $user, Patient $patient): bool
     {
-        return $user->isAdmin();
+        return $patient->user_id === $user->id;
     }
 
     /**
-     * Determine if user can permanently delete the patient
+     * Force delete patient
      */
     public function forceDelete(User $user, Patient $patient): bool
     {
-        return $user->isAdmin();
+        return $patient->user_id === $user->id;
     }
 }

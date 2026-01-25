@@ -2,19 +2,21 @@
 
 namespace App\Repositories;
 
-use App\Models\Patient;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+
+use App\Models\{Patient,User};
 
 class PatientRepository
 {
     /**
      * Get filtered and paginated patients.
      */
-    public function getPaginated(array $filters, int $perPage = 15): LengthAwarePaginator
+    public function getPaginated(array $filters,User $user, int $perPage = 15): LengthAwarePaginator
     {
         return Patient::query()
             ->with('insuranceCard')
+            ->where('user_id',$user->id)
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
@@ -30,16 +32,19 @@ class PatientRepository
     /**
      * Create patient and related insurance in one transaction.
      */
-    public function createWithInsurance(array $data): Patient
+    public function createWithInsurance(array $data,User $user): Patient
     {
-        return DB::transaction(function () use ($data) {
-            $patient = Patient::create($data);
+        return DB::transaction(function () use ($data,$user) {
+            $patient = Patient::create([
+                ...$data,
+                'user_id' => $user->id,
+            ]);
 
-            if (!empty($data['insurance_policy_number'])) {
+            if (!empty($data['insurance'])) {
                 $patient->insuranceCard()->create([
-                    'policy_number' => $data['insurance_policy_number'],
-                    'provider_name' => $data['insurance_provider'] ?? 'Unknown',
-                    'expiry_date'   => $data['insurance_expiry_date'] ?? null,
+                    'policy_number' => $data['insurance']['policy_number'],
+                    'provider_name' => $data['insurance']['provider_name'] ?? 'Unknown',
+                    'expiry_date'   => $data['insurance']['expiry_date'] ?? null,
                 ]);
             }
 
@@ -55,14 +60,18 @@ class PatientRepository
         return DB::transaction(function () use ($patient, $data) {
             $patient->update($data);
 
-            if (isset($data['insurance_policy_number'])) {
+            if (isset($data['insurance'])) {
                 $patient->insuranceCard()->updateOrCreate(
                     ['patient_id' => $patient->id],
                     [
-                        'policy_number' => $data['insurance_policy_number'],
-                        'provider_name' => $data['insurance_provider'] ?? 'Unknown',
+                        'policy_number' => $data['insurance']['policy_number'],
+                        'provider_name' => $data['insurance']['provider_name'] ?? 'Unknown',
+                        'expiry_date'   => $data['insurance']['expiry_date'] ?? null,
                     ]
                 );
+            }
+            else{
+                $patient->insuranceCard()->delete();
             }
 
             return $patient->fresh('insuranceCard');

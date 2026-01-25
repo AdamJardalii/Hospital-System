@@ -26,6 +26,7 @@ class Patient extends Model
         'allergies',
         'current_medications',
         'blood_type',
+        'user_id'
     ];
 
     protected function casts(): array
@@ -52,5 +53,10 @@ class Patient extends Model
     public function getAgeAttribute(): int
     {
         return $this->date_of_birth->age;
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

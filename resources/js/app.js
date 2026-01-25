@@ -1,7 +1,11 @@
-import './bootstrap';
+import "./bootstrap";
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import App from "./App.vue";
+import "../css/app.css";
 
-import Alpine from 'alpinejs';
+const pinia = createPinia();
+const app = createApp(App);
 
-window.Alpine = Alpine;
-
-Alpine.start();
+app.use(pinia);
+app.mount("#app");

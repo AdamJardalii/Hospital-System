@@ -39,7 +39,10 @@ class GroqService implements RawTextAIScannerInterface
                 - nssf (set to true if the text indicates National Social Security Fund or CNSS, else false)
                 - Company (insurance provider name)
                 - class (type of insurance plan, e.g., HMO, PPO, etc.)
+                - gender: string (male or female or other)
+                - date_of_birth: string (use YYYY-MM-DD format)
                 - other: array (a list of strings for any extra info like blood type, card type, or plan level)
+                - phone_number: string (contact number on the card)
 
                 Ensure the JSON is properly formatted.
 
