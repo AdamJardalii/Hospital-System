@@ -6,5 +6,5 @@
   pkgs = ["...", "tesseract", "tesseract-ocr-eng", "tesseract-ocr-ara"]
 
 [deploy]
-  startCommand = "php artisan migrate --force && apache2-foreground"
+  startCommand = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
   # Or "php artisan serve --host=0.0.0.0 --port=$PORT" if not using Apache
