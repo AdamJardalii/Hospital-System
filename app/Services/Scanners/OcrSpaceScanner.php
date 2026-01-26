@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Scanners;
 
 use Illuminate\Support\Facades\Http;
 use Exception;
@@ -31,16 +31,6 @@ class OcrSpaceScanner implements InsuranceScannerInterface
             } catch (Exception $e) {
                 return ['success' => false, 'message' => $e->getMessage()];
             }
-    }
-
-    private function parseText(string $text): array
-    {
-        // Simple regex logic (Same as previous step)
-        preg_match('/ID[:\s]+([A-Z0-9-]+)/i', $text, $id);
-        return [
-            'policy_number' => $id[1] ?? 'Unknown',
-            'raw_text' => $text
-        ];
     }
 
     private function getRawTextFromOcrSpace(string $imagePath):?string{

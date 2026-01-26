@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 
 use App\Contracts\{InsuranceScannerInterface,RawTextAIScannerInterface};
-use App\Services\{OcrSpaceScanner,GeminiScannerService,GroqService};
+use App\Services\{GroqService,ScannerManager};
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -13,8 +13,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(InsuranceScannerInterface::class, OcrSpaceScanner::class);
         $this->app->bind(RawTextAIScannerInterface::class, GroqService::class);
+        $this->app->singleton(ScannerManager::class, fn($app) => new ScannerManager($app));
     }
 
     /**

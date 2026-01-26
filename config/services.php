@@ -45,4 +45,14 @@ return [
         'key' => env('GROQ_API_KEY'),
         'url' => 'https://api.groq.com/openai/v1/chat/completions',
     ],
+    'paddle' => [
+        'python_path' => env('PADDLE_PYTHON_PATH'),
+        'script_path' => env('PADDLE_SCRIPT_PATH'),
+    ],
+    'google' => [
+        'credentials_path' => env('GOOGLE_APPLICATION_CREDENTIALS_PATH'),
+    ],
+    'insurance'=>[
+        'default_scanner'=>env('INSURANCE_SCANNER_DEFAULT','ocr_space')
+    ]
 ];

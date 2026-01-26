@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Scanners;
 
 use App\Contracts\InsuranceScannerInterface;
 use Illuminate\Support\Facades\Http;
