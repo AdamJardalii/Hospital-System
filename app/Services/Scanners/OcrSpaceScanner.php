@@ -35,12 +35,23 @@ class OcrSpaceScanner implements InsuranceScannerInterface
 
     private function getRawTextFromOcrSpace(string $imagePath):?string{
         $filename = basename($imagePath) . '.jpg';
-        $response = Http::withOptions(['verify' => 'C:/laragon/etc/ssl/cacert.pem'])->asMultipart()->attach('file', fopen($imagePath, 'r'), $filename)->post($this->apiUrl, [
-            'apikey' => $this->apiKey,
-            'OCREngine' => 2,
-            'isOverlayRequired' => 'false',
-            'language' => 'eng',
-        ]);
+        $verify = app()->environment('production') ? true : config('services.ocr.ssl_path', true);
+
+        $response = Http::withOptions(['verify' => $verify])
+            ->asMultipart()
+            ->attach('file', fopen($imagePath, 'r'), $filename)
+            ->post($this->apiUrl, [
+                'apikey' => $this->apiKey,
+                'OCREngine' => 2,
+                'isOverlayRequired' => 'false',
+                'language' => 'eng',
+            ]);
+        // $response = Http::withOptions(['verify' => 'C:/laragon/etc/ssl/cacert.pem'])->asMultipart()->attach('file', fopen($imagePath, 'r'), $filename)->post($this->apiUrl, [
+        //     'apikey' => $this->apiKey,
+        //     'OCREngine' => 2,
+        //     'isOverlayRequired' => 'false',
+        //     'language' => 'eng',
+        // ]);
 
         if ($response->successful()) {
             return $response->json('ParsedResults.0.ParsedText');
