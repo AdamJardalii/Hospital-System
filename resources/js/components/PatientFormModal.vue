@@ -51,15 +51,19 @@
                 <!-- AI Scanner -->
                 <div
                     v-if="mode === 'create' || mode === 'edit'"
-                    class="px-6 py-4 bg-blue-50 border-b border-blue-100"
+                    class="px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100"
                 >
-                    <div class="flex items-center justify-between">
+                    <!-- Header Row -->
+                    <div
+                        class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+                    >
+                        <!-- Left: Icon & Title -->
                         <div class="flex items-center space-x-3">
                             <div
-                                class="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center"
+                                class="h-12 w-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg"
                             >
                                 <svg
-                                    class="h-6 w-6 text-white"
+                                    class="h-7 w-7 text-white"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -79,58 +83,205 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-slate-900">
-                                    Magic Scan
+                                <h4 class="font-bold text-slate-900 text-lg">
+                                    AI Magic Scan
                                 </h4>
                                 <p class="text-sm text-gray-600">
-                                    Auto-fill from insurance card
+                                    Auto-fill patient data from insurance card
                                 </p>
                             </div>
                         </div>
-                        <div>
-                            <input
-                                ref="fileInput"
-                                type="file"
-                                accept="image/*"
-                                class="hidden"
-                                @change="handleScan"
-                            />
-                            <button
-                                @click="$refs.fileInput.click()"
-                                :disabled="scanning"
-                                class="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
-                            >
-                                <svg
-                                    v-if="!scanning"
-                                    class="h-5 w-5"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
+
+                        <!-- Right: AI Agent Selector & Scan Button -->
+                        <div
+                            class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3"
+                        >
+                            <!-- AI Agent Selector -->
+                            <div class="relative">
+                                <label
+                                    class="block text-xs font-medium text-gray-700 mb-1"
                                 >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-                                    />
-                                </svg>
+                                    AI Engine
+                                </label>
+                                <select
+                                    v-model="selectedAgent"
+                                    class="w-full sm:w-48 pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition bg-white text-sm font-medium"
+                                >
+                                    <option
+                                        v-for="agent in aiAgents"
+                                        :key="agent.value"
+                                        :value="agent.value"
+                                        :disabled="
+                                            agent.status === 'development'
+                                        "
+                                    >
+                                        {{ agent.label }}
+                                        {{
+                                            agent.status === "development"
+                                                ? "(Coming Soon)"
+                                                : ""
+                                        }}
+                                    </option>
+                                </select>
+                                <!-- Icon in dropdown -->
                                 <div
-                                    v-else
-                                    class="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"
-                                ></div>
-                                <span>{{
-                                    scanning
-                                        ? "Scanning..."
-                                        : "Scan & Auto-Fill"
-                                }}</span>
-                            </button>
+                                    class="absolute left-3 top-[26px] pointer-events-none"
+                                >
+                                    <svg
+                                        class="h-4 w-4 text-blue-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                                        />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Scan Button -->
+                            <div class="flex flex-col">
+                                <label
+                                    class="block text-xs font-medium text-transparent mb-1"
+                                >
+                                    Action
+                                </label>
+                                <input
+                                    ref="fileInput"
+                                    type="file"
+                                    accept="image/*"
+                                    class="hidden"
+                                    @change="handleScan"
+                                />
+                                <button
+                                    type="button"
+                                    @click="$refs.fileInput.click()"
+                                    :disabled="
+                                        scanning ||
+                                        aiAgents.find(
+                                            (a) => a.value === selectedAgent,
+                                        )?.status === 'development'
+                                    "
+                                    class="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                                >
+                                    <svg
+                                        v-if="!scanning"
+                                        class="h-5 w-5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                                        />
+                                    </svg>
+                                    <div
+                                        v-else
+                                        class="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"
+                                    ></div>
+                                    <span>{{
+                                        scanning
+                                            ? "Scanning..."
+                                            : "Scan & Auto-Fill"
+                                    }}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selected Agent Info -->
+                    <div
+                        class="mt-4 flex items-start space-x-2 bg-white bg-opacity-60 rounded-lg p-3 border border-blue-200"
+                    >
+                        <svg
+                            class="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-900">
+                                {{
+                                    aiAgents.find(
+                                        (a) => a.value === selectedAgent,
+                                    )?.label
+                                }}
+                            </p>
+                            <p class="text-xs text-gray-600 mt-0.5">
+                                {{
+                                    aiAgents.find(
+                                        (a) => a.value === selectedAgent,
+                                    )?.description
+                                }}
+                            </p>
+                            <div
+                                v-if="
+                                    aiAgents.find(
+                                        (a) => a.value === selectedAgent,
+                                    )?.status === 'development'
+                                "
+                                class="mt-2"
+                            >
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+                                >
+                                    <svg
+                                        class="h-3 w-3 mr-1"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                    </svg>
+                                    Under Development
+                                </span>
+                            </div>
+                            <div v-else class="mt-2">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                >
+                                    <svg
+                                        class="h-3 w-3 mr-1"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                    </svg>
+                                    Ready to Use
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Scanning Progress -->
                     <div
                         v-if="scanning"
-                        class="mt-4 bg-white rounded-lg p-4 border border-blue-200"
+                        class="mt-4 bg-white rounded-lg p-4 border border-blue-200 shadow-sm"
                     >
                         <div class="flex items-center space-x-3">
                             <div class="flex-shrink-0">
@@ -153,11 +304,17 @@
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <p class="font-medium text-slate-900">
+                                <p class="font-semibold text-slate-900">
                                     Reading Insurance Card...
                                 </p>
                                 <p class="text-sm text-gray-600">
-                                    Extracting patient information
+                                    Using
+                                    {{
+                                        aiAgents.find(
+                                            (a) => a.value === selectedAgent,
+                                        )?.label
+                                    }}
+                                    to extract patient information
                                 </p>
                             </div>
                         </div>
@@ -165,7 +322,7 @@
                             class="mt-3 bg-gray-200 rounded-full h-2 overflow-hidden"
                         >
                             <div
-                                class="bg-blue-600 h-full rounded-full skeleton"
+                                class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full skeleton"
                             ></div>
                         </div>
                     </div>
@@ -505,6 +662,34 @@ const scanning = ref(false);
 const loading = ref(false);
 const error = ref("");
 const hasInsurance = ref(false);
+const selectedAgent = ref("ocr_space");
+
+const aiAgents = [
+    {
+        value: "ocr_space",
+        label: "OCR Space",
+        status: "active",
+        description: "Fast and reliable OCR",
+    },
+    {
+        value: "tesseract",
+        label: "Tesseract",
+        status: "active",
+        description: "Open-source OCR engine",
+    },
+    {
+        value: "google",
+        label: "Google Vision",
+        status: "development",
+        description: "Under development",
+    },
+    {
+        value: "paddle",
+        label: "Paddle OCR",
+        status: "development",
+        description: "Under development",
+    },
+];
 
 const form = reactive({
     first_name: "",
@@ -576,7 +761,10 @@ const handleScan = async (event) => {
     error.value = "";
 
     try {
-        const scannedData = await ScannerService.scanCard(file);
+        const scannedData = await ScannerService.scanCard(
+            file,
+            selectedAgent.value,
+        );
 
         if (scannedData.first_name) form.first_name = scannedData.first_name;
         if (scannedData.last_name) form.last_name = scannedData.last_name;

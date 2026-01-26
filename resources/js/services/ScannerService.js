@@ -1,12 +1,15 @@
 import apiClient from "./api";
 
 export const ScannerService = {
-    async scanCard(file) {
+    async scanCard(file, driverName = "ocr_space") {
         const formData = new FormData();
         formData.append("card_image", file);
 
         try {
             const response = await apiClient.post("/ocr/scan", formData, {
+                params: {
+                    driver_name: driverName,
+                },
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
