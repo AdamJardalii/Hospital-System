@@ -674,8 +674,8 @@ const aiAgents = [
     {
         value: "tesseract",
         label: "Tesseract",
-        status: "active",
-        description: "Open-source OCR engine",
+        status: "development",
+        description: "Under development",
     },
     {
         value: "google",
