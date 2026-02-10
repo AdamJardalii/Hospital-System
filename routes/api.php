@@ -11,5 +11,6 @@ Route::middleware(['auth:sanctum',])->group(function () {
     Route::apiResource('patients', PatientController::class);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::delete('/insurance/{patient}', [InsuranceController::class, 'destroy']);
-    Route::post('/ocr/scan', [OCRScannerController::class, 'scanInsurance']);
 });
+
+Route::post('/ocr/scan', [OCRScannerController::class, 'scanInsurance']);
